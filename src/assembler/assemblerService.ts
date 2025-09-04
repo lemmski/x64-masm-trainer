@@ -15,14 +15,31 @@ export interface AssemblerOptions {
 
 export class AssemblerService {
   private readonly tempDir: string;
-  private readonly ml64Path: string;
-  private readonly linkPath: string;
+  private ml64Path!: string;
+  private linkPath!: string;
 
   constructor() {
     this.tempDir = path.join(process.cwd(), 'temp');
-    // Default paths for Visual Studio build tools
-    this.ml64Path = this.findML64Path();
-    this.linkPath = this.findLinkPath();
+    // Don't initialize paths immediately to avoid startup crashes
+  }
+
+  private ensurePaths(): void {
+    if (!this.ml64Path) {
+      this.ml64Path = this.findML64Path();
+    }
+    if (!this.linkPath) {
+      this.linkPath = this.findLinkPath();
+    }
+  }
+
+  private getML64Path(): string {
+    this.ensurePaths();
+    return this.ml64Path;
+  }
+
+  private getLinkPath(): string {
+    this.ensurePaths();
+    return this.linkPath;
   }
 
   private findML64Path(): string {
@@ -227,7 +244,7 @@ export class AssemblerService {
     workingDir: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const compileCmd = `"${this.ml64Path}" /c /Fo"${objFile}" "${asmFile}"`;
+      const compileCmd = `"${this.getML64Path()}" /c /Fo"${objFile}" "${asmFile}"`;
       const { stdout, stderr } = await execAsync(compileCmd, {
         cwd: workingDir,
         timeout: 10000
@@ -249,7 +266,7 @@ export class AssemblerService {
     workingDir: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const linkCmd = `"${this.linkPath}" /SUBSYSTEM:CONSOLE /OUT:"${exeFile}" "${objFile}"`;
+      const linkCmd = `"${this.getLinkPath()}" /SUBSYSTEM:CONSOLE /OUT:"${exeFile}" "${objFile}"`;
       const { stdout, stderr } = await execAsync(linkCmd, {
         cwd: workingDir,
         timeout: 10000
@@ -337,7 +354,7 @@ export class AssemblerService {
       const asmFile = path.join(buildDir, 'syntax_check.asm');
       await fs.writeFile(asmFile, code);
 
-      const compileCmd = `"${this.ml64Path}" /c /Fo"${path.join(buildDir, 'check.obj')}" "${asmFile}"`;
+      const compileCmd = `"${this.getML64Path()}" /c /Fo"${path.join(buildDir, 'check.obj')}" "${asmFile}"`;
       const { stdout, stderr } = await execAsync(compileCmd, {
         cwd: buildDir,
         timeout: 5000

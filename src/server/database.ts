@@ -120,6 +120,7 @@ export async function initializeDatabase(): Promise<void> {
         solution TEXT NOT NULL,
         difficulty TEXT NOT NULL,
         points INTEGER NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (lesson_id) REFERENCES lessons (id)
       )
     `);
