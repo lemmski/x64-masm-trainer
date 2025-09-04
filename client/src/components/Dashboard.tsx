@@ -59,7 +59,107 @@ const Dashboard: React.FC = () => {
 
   const loadDashboardData = async () => {
     try {
-      // Simulate API calls - replace with actual API calls
+      // Fetch real data from APIs
+      const [lessonsResponse, userResponse] = await Promise.all([
+        fetch('/api/lessons'),
+        fetch('/api/users/user-1') // TODO: Get from authentication context
+      ]);
+
+      const lessons = await lessonsResponse.json();
+
+      // Calculate stats from real data
+      const userId = 'user-1';
+      let totalCompletedLessons = 0;
+      let totalCompletedExercises = 0;
+      let totalPoints = 0;
+      let totalStudyTime = 0;
+      let totalScore = 0;
+      let scoreCount = 0;
+
+      // Fetch progress for all lessons
+      const progressPromises = lessons.map(async (lesson: any) => {
+        try {
+          const response = await fetch(`/api/exercises/progress/${userId}/${lesson.id}`);
+          const progress = await response.json();
+          return { lesson, progress };
+        } catch (error) {
+          return { lesson, progress: null };
+        }
+      });
+
+      const progressResults = await Promise.all(progressPromises);
+
+      progressResults.forEach(({ lesson, progress }) => {
+        if (progress) {
+          if (progress.completed) {
+            totalCompletedLessons++;
+            totalPoints += progress.score || 0;
+          }
+          totalCompletedExercises += progress.completedExercises?.length || 0;
+          totalStudyTime += progress.timeSpent || 0;
+          if (progress.score) {
+            totalScore += progress.score;
+            scoreCount++;
+          }
+        }
+      });
+
+      setStats({
+        totalLessons: lessons.length,
+        completedLessons: totalCompletedLessons,
+        totalExercises: lessons.reduce((acc: number, lesson: any) => acc + (lesson.exercises?.length || 0), 0),
+        completedExercises: totalCompletedExercises,
+        totalPoints: totalPoints,
+        currentStreak: 5, // TODO: Calculate from real data
+        studyTime: totalStudyTime,
+        averageScore: scoreCount > 0 ? totalScore / scoreCount : 0
+      });
+
+      // Generate recent activity from progress data (simplified)
+      const recentActivity: RecentActivity[] = [];
+      progressResults.forEach(({ lesson, progress }) => {
+        if (progress && progress.lastAttempt) {
+          recentActivity.push({
+            id: `lesson-${lesson.id}`,
+            type: progress.completed ? 'lesson_completed' : 'exercise_completed',
+            title: lesson.title,
+            description: progress.completed ? 'Lesson completed' : `${progress.completedExercises?.length || 0} exercises completed`,
+            timestamp: new Date(progress.lastAttempt),
+            points: progress.score || 0
+          });
+        }
+      });
+
+      // Sort by timestamp and take the most recent 3
+      recentActivity.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+      setRecentActivity(recentActivity.slice(0, 3));
+
+      // Set recommended lessons (prioritize incomplete lessons)
+      const recommendedLessons: RecommendedLesson[] = lessons
+        .filter((lesson: any) => {
+          const progress = progressResults.find(p => p.lesson.id === lesson.id)?.progress;
+          return !progress || !progress.completed;
+        })
+        .slice(0, 3)
+        .map((lesson: any, index: number) => {
+          const progress = progressResults.find(p => p.lesson.id === lesson.id)?.progress;
+          return {
+            id: lesson.id,
+            title: lesson.title,
+            description: lesson.description,
+            difficulty: lesson.difficulty,
+            estimatedTime: lesson.estimatedTime,
+            progress: progress ? (progress.completedExercises?.length / (lesson.exercises?.length || 1)) * 100 : 0,
+            isNew: index === 0 // Mark first one as new
+          };
+        });
+
+      setRecommendedLessons(recommendedLessons);
+
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+
+      // Fallback to fake data if API calls fail
       setStats({
         totalLessons: 6,
         completedLessons: 3,
@@ -67,7 +167,7 @@ const Dashboard: React.FC = () => {
         completedExercises: 12,
         totalPoints: 385,
         currentStreak: 5,
-        studyTime: 420, // minutes
+        studyTime: 420,
         averageScore: 82.5
       });
 
@@ -77,7 +177,7 @@ const Dashboard: React.FC = () => {
           type: 'exercise_completed',
           title: 'Basic Arithmetic',
           description: 'Completed with 95% score',
-          timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
+          timestamp: new Date(Date.now() - 1000 * 60 * 30),
           points: 15
         },
         {
@@ -85,7 +185,7 @@ const Dashboard: React.FC = () => {
           type: 'achievement_earned',
           title: 'Quick Learner',
           description: 'Completed 3 exercises in one session',
-          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
           points: 10
         },
         {
@@ -93,7 +193,7 @@ const Dashboard: React.FC = () => {
           type: 'lesson_completed',
           title: 'Working with Registers',
           description: 'Mastered register operations',
-          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
           points: 50
         }
       ]);
@@ -127,8 +227,6 @@ const Dashboard: React.FC = () => {
           isNew: false
         }
       ]);
-    } catch (error) {
-      console.error('Error loading dashboard data:', error);
     } finally {
       setLoading(false);
     }

@@ -78,6 +78,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   const fetchLessons = async () => {
     try {
       const response = await fetch('/api/lessons');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
       setLessons(data);
 
@@ -95,10 +98,14 @@ const Sidebar: React.FC<SidebarProps> = ({
     const progressPromises = lessonList.map(async (lesson) => {
       try {
         const response = await fetch(`/api/exercises/progress/${userId}/${lesson.id}`);
+        if (!response.ok) {
+          // If endpoint doesn't exist or returns error, return null
+          return { lessonId: lesson.id, progress: null };
+        }
         const progress = await response.json();
         return { lessonId: lesson.id, progress };
       } catch (error) {
-        console.error(`Error fetching progress for lesson ${lesson.id}:`, error);
+        // Silently handle errors for progress (it's optional data)
         return { lessonId: lesson.id, progress: null };
       }
     });

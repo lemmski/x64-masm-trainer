@@ -9,6 +9,9 @@ import HelpCenter from './components/HelpCenter';
 import ApiDocs from './components/ApiDocs';
 import AssemblyReference from './components/AssemblyReference';
 import ErrorBoundary from './components/ErrorBoundary';
+import Learn from './components/Learn';
+import Practice from './components/Practice';
+import Progress from './components/Progress';
 // Using local type definitions for client-side
 interface Lesson {
   id: string;
@@ -65,6 +68,9 @@ function App() {
               <ErrorBoundary>
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
+                  <Route path="/learn" element={<Learn />} />
+                  <Route path="/practice" element={<Practice />} />
+                  <Route path="/progress" element={<Progress />} />
                   <Route
                     path="/lesson/:id"
                     element={
