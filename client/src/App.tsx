@@ -43,7 +43,7 @@ function App() {
   return (
     <ErrorBoundary>
       <Router>
-        <div className="min-h-screen bg-gray-900 text-white">
+        <div className="min-h-screen bg-gray-900 text-white flex flex-col">
           <Header
             onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
             sidebarOpen={sidebarOpen}
@@ -52,7 +52,7 @@ function App() {
             onOpenAssemblyRef={() => setAssemblyRefOpen(true)}
           />
 
-          <div className="flex">
+          <div className="flex flex-1 overflow-hidden">
             <Sidebar
               isOpen={sidebarOpen}
               onLessonSelect={setSelectedLesson}
@@ -61,7 +61,7 @@ function App() {
               selectedExercise={selectedExercise}
             />
 
-            <main className="flex-1 p-6">
+            <main className="flex-1 bg-gray-900 p-4 md:p-6 overflow-y-auto overflow-x-hidden">
               <ErrorBoundary>
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
