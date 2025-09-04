@@ -70,15 +70,35 @@ npm install
 cd ..
 ```
 
-### 3. Verify MASM Installation
+### 3. Set up Visual Studio Environment
 ```bash
-# Check if ML64.exe is available
+# Run this command in a new Command Prompt window to set up the environment:
+%comspec% /k "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
+
+# OR use the provided batch file:
+start-dev.bat
+```
+
+### 4. Verify MASM Installation
+```bash
+# After setting up the environment, verify ML64.exe is available
 ml64 /?
 
 # If not found, it will be located automatically by the application
 ```
 
-### 4. Build the Application
+### 4.5 Verify Tailwind CSS Setup
+```bash
+# Check if Tailwind CSS v4 is properly configured
+cd client && npm list tailwindcss
+# Should show: tailwindcss@4.1.12
+
+# Check if Vite plugin is installed
+cd client && npm list @tailwindcss/vite
+# Should show: @tailwindcss/vite@4.1.12
+```
+
+### 5. Build the Application
 ```bash
 # Build both server and client
 npm run build
@@ -88,7 +108,12 @@ npm run build
 
 ### Development Mode
 ```bash
-# Start both server and client with hot reloading
+# Option 1: Use the provided batch file (recommended)
+start-dev.bat
+
+# Option 2: Manual setup - First run this in a separate Command Prompt:
+%comspec% /k "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
+# Then in another terminal:
 npm run dev
 ```
 
@@ -107,7 +132,10 @@ The application will be available at: http://localhost:3001
 
 ### Manual Startup
 ```bash
-# Terminal 1: Start the backend server
+# First, set up Visual Studio environment in a new Command Prompt:
+%comspec% /k "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
+
+# Terminal 1: Start the backend server (in the VS environment)
 npm run dev:server
 
 # Terminal 2: Start the frontend client
