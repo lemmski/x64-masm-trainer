@@ -9,10 +9,11 @@ import {
   ExternalLink,
   Download,
   Lightbulb,
-  Tool,
+  Settings,
   FileText,
   Video,
-  MessageCircle
+  MessageCircle,
+  X
 } from 'lucide-react';
 
 interface HelpCenterProps {

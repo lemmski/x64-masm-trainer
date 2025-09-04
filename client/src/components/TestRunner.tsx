@@ -12,14 +12,72 @@ import {
   Shield,
   BookOpen
 } from 'lucide-react';
-import {
-  TestSuite,
-  TestExecutionResult,
-  DetailedGrade,
-  TestRunnerResult,
-  QuickValidationResult
-} from '../../../../src/shared/types';
-import { TestRunnerOptions } from '../../../src/tests/testRunner';
+// Using local type definitions for client-side
+interface TestCase {
+  id: string;
+  name: string;
+  description: string;
+  input: string;
+  expectedOutput: string;
+  timeout?: number;
+  points?: number;
+}
+
+interface TestResult {
+  testCaseId: string;
+  passed: boolean;
+  actualOutput: string;
+  expectedOutput: string;
+  executionTime: number;
+  error: string | undefined;
+}
+
+interface TestSuite {
+  id: string;
+  name: string;
+  description: string;
+  testCases: TestCase[];
+  configuration: any;
+}
+
+interface TestExecutionResult {
+  testSuiteId: string;
+  results: TestResult[];
+  summary: any;
+  grade: any;
+  feedback: any;
+}
+
+interface DetailedGrade {
+  score: number;
+  maxScore: number;
+  percentage: number;
+  letterGrade: string;
+  breakdown: any;
+  feedback: any;
+  recommendations: any[];
+}
+
+interface TestRunnerResult {
+  results: TestResult[];
+  summary: any;
+  grade: any;
+  feedback: any;
+  testExecution?: TestExecutionResult;
+}
+
+interface QuickValidationResult {
+  results: TestResult[];
+  summary: any;
+  grade: any;
+  feedback: any;
+}
+
+interface TestRunnerOptions {
+  timeout?: number;
+  iterations?: number;
+  memoryLimit?: number;
+}
 
 interface TestRunnerProps {
   exerciseId: string;

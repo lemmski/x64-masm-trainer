@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, Circle, Trophy, Clock, Target } from 'lucide-react';
-import { LessonProgress } from '../../../../src/shared/types';
+// Using local type definitions for client-side
+interface LessonProgress {
+  lessonId: string;
+  completed: boolean;
+  score: number;
+  timeSpent: number;
+  attempts: number;
+  lastAttempt: Date;
+  completedExercises: string[];
+}
 
 interface ProgressTrackerProps {
   userId: string;

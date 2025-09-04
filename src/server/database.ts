@@ -10,10 +10,54 @@ fs.ensureDirSync(path.dirname(DB_PATH));
 
 const db = new sqlite3.Database(DB_PATH);
 
-// Promisify database methods
-const dbRun = promisify(db.run.bind(db));
-const dbGet = promisify(db.get.bind(db));
-const dbAll = promisify(db.all.bind(db));
+// Promisify database methods with proper parameter handling
+const dbRun = (sql: string, params?: any[]) => {
+  return new Promise<void>((resolve, reject) => {
+    if (params && params.length > 0) {
+      db.run(sql, params, function(err) {
+        if (err) reject(err);
+        else resolve();
+      });
+    } else {
+      db.run(sql, function(err) {
+        if (err) reject(err);
+        else resolve();
+      });
+    }
+  });
+};
+
+const dbGet = (sql: string, params?: any[]) => {
+  return new Promise<any>((resolve, reject) => {
+    if (params && params.length > 0) {
+      db.get(sql, params, function(err, row) {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    } else {
+      db.get(sql, function(err, row) {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    }
+  });
+};
+
+const dbAll = (sql: string, params?: any[]) => {
+  return new Promise<any[]>((resolve, reject) => {
+    if (params && params.length > 0) {
+      db.all(sql, params, function(err, rows) {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    } else {
+      db.all(sql, function(err, rows) {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    }
+  });
+};
 
 export async function initializeDatabase(): Promise<void> {
   try {

@@ -46,15 +46,18 @@ export class LessonService {
 
     query += ' ORDER BY created_at ASC';
 
-    const lessons = await dbAll(query, params);
+    const lessons = params ? await dbAll(query, params) : await dbAll(query);
 
-    return lessons.map((lesson: any) => ({
-      ...lesson,
-      content: JSON.parse(lesson.content),
-      prerequisites: JSON.parse(lesson.prerequisites),
-      exercises: JSON.parse(lesson.exercises),
-      tags: JSON.parse(lesson.tags)
-    }));
+    return lessons.map((lesson: any) => {
+      if (!lesson) return null;
+      return {
+        ...lesson,
+        content: JSON.parse(lesson.content || '{}'),
+        prerequisites: JSON.parse(lesson.prerequisites || '[]'),
+        exercises: JSON.parse(lesson.exercises || '[]'),
+        tags: JSON.parse(lesson.tags || '[]')
+      };
+    }).filter(Boolean);
   }
 
   /**
@@ -66,15 +69,15 @@ export class LessonService {
     if (!lesson) return null;
 
     // Get exercises for this lesson
-    const exerciseIds = JSON.parse(lesson.exercises);
+    const exerciseIds = JSON.parse(lesson.exercises || '[]');
     const exercises = await this.getExercisesByIds(exerciseIds);
 
     return {
       ...lesson,
-      content: JSON.parse(lesson.content),
-      prerequisites: JSON.parse(lesson.prerequisites),
+      content: JSON.parse(lesson.content || '{}'),
+      prerequisites: JSON.parse(lesson.prerequisites || '[]'),
       exercises,
-      tags: JSON.parse(lesson.tags)
+      tags: JSON.parse(lesson.tags || '[]')
     };
   }
 
@@ -112,11 +115,14 @@ export class LessonService {
       [lessonId]
     );
 
-    return exercises.map((exercise: any) => ({
-      ...exercise,
-      testCases: JSON.parse(exercise.test_cases),
-      hints: JSON.parse(exercise.hints)
-    }));
+    return exercises.map((exercise: any) => {
+      if (!exercise) return null;
+      return {
+        ...exercise,
+        testCases: JSON.parse(exercise.test_cases || '[]'),
+        hints: JSON.parse(exercise.hints || '[]')
+      };
+    }).filter(Boolean);
   }
 
   /**
@@ -146,11 +152,14 @@ export class LessonService {
       ids
     );
 
-    return exercises.map((exercise: any) => ({
-      ...exercise,
-      testCases: JSON.parse(exercise.test_cases),
-      hints: JSON.parse(exercise.hints)
-    }));
+    return exercises.map((exercise: any) => {
+      if (!exercise) return null;
+      return {
+        ...exercise,
+        testCases: JSON.parse(exercise.test_cases || '[]'),
+        hints: JSON.parse(exercise.hints || '[]')
+      };
+    }).filter(Boolean);
   }
 
   /**

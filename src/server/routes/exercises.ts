@@ -9,9 +9,11 @@ router.get('/lesson/:lessonId', async (req, res) => {
   try {
     const exercises = await lessonService.getExercisesForLesson(req.params.lessonId);
     res.json(exercises);
+    return;
   } catch (error) {
     console.error('Error fetching exercises:', error);
     res.status(500).json({ error: 'Failed to fetch exercises' });
+    return;
   }
 });
 
@@ -25,9 +27,11 @@ router.get('/:id', async (req, res) => {
     }
 
     res.json(exercise);
+    return;
   } catch (error) {
     console.error('Error fetching exercise:', error);
     res.status(500).json({ error: 'Failed to fetch exercise' });
+    return;
   }
 });
 
@@ -42,9 +46,11 @@ router.post('/:id/submit', async (req, res) => {
 
     const submission = await lessonService.submitExercise(req.params.id, userId, code);
     res.json(submission);
+    return;
   } catch (error) {
     console.error('Error submitting exercise:', error);
     res.status(500).json({ error: 'Failed to submit exercise' });
+    return;
   }
 });
 
@@ -66,9 +72,11 @@ router.get('/progress/:userId/:lessonId', async (req, res) => {
     }
 
     res.json(progress);
+    return;
   } catch (error) {
     console.error('Error fetching exercise progress:', error);
     res.status(500).json({ error: 'Failed to fetch exercise progress' });
+    return;
   }
 });
 

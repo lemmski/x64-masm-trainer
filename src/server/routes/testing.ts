@@ -43,9 +43,11 @@ router.post('/generate/:exerciseId', async (req, res) => {
     }
 
     res.json(testSuite);
+    return;
   } catch (error) {
     console.error('Error generating test cases:', error);
     res.status(500).json({ error: 'Failed to generate test cases' });
+    return;
   }
 });
 
@@ -70,12 +72,14 @@ router.post('/run/:exerciseId', async (req, res) => {
     const result = await testRunner.runTestSuite(exercise, code, userId, testSuite, options);
 
     res.json(result);
+    return;
   } catch (error) {
     console.error('Error running test suite:', error);
     res.status(500).json({
       error: 'Failed to run test suite',
       details: error
     });
+    return;
   }
 });
 
@@ -95,12 +99,14 @@ router.post('/validate/:exerciseId', async (req, res) => {
     const result = await testRunner.runQuickValidation(code, testCases);
 
     res.json(result);
+    return;
   } catch (error) {
     console.error('Error running quick validation:', error);
     res.status(500).json({
       error: 'Failed to run validation',
       details: error
     });
+    return;
   }
 });
 
@@ -120,12 +126,14 @@ router.post('/benchmark/:exerciseId', async (req, res) => {
     const result = await testRunner.runPerformanceBenchmark(code, testCases, iterations);
 
     res.json(result);
+    return;
   } catch (error) {
     console.error('Error running performance benchmark:', error);
     res.status(500).json({
       error: 'Failed to run benchmark',
       details: error
     });
+    return;
   }
 });
 
@@ -143,12 +151,14 @@ router.post('/security/:exerciseId', async (req, res) => {
     const result = await testRunner.runSecurityAnalysis(code);
 
     res.json(result);
+    return;
   } catch (error) {
     console.error('Error running security analysis:', error);
     res.status(500).json({
       error: 'Failed to run security analysis',
       details: error
     });
+    return;
   }
 });
 
@@ -166,12 +176,14 @@ router.post('/quality/:exerciseId', async (req, res) => {
     const result = await testRunner.runCodeQualityAnalysis(code);
 
     res.json(result);
+    return;
   } catch (error) {
     console.error('Error running code quality analysis:', error);
     res.status(500).json({
       error: 'Failed to run quality analysis',
       details: error
     });
+    return;
   }
 });
 
@@ -210,9 +222,11 @@ router.get('/grading/:exerciseId', async (req, res) => {
       criteria,
       totalWeight: Object.values(criteria).reduce((sum, c) => sum + c.weight, 0)
     });
+    return;
   } catch (error) {
     console.error('Error getting grading criteria:', error);
     res.status(500).json({ error: 'Failed to get grading criteria' });
+    return;
   }
 });
 
@@ -246,9 +260,11 @@ router.get('/stats/:exerciseId', async (req, res) => {
     };
 
     res.json(stats);
+    return;
   } catch (error) {
     console.error('Error getting test statistics:', error);
     res.status(500).json({ error: 'Failed to get test statistics' });
+    return;
   }
 });
 
@@ -303,9 +319,11 @@ router.get('/templates', async (req, res) => {
     ];
 
     res.json(templates);
+    return;
   } catch (error) {
     console.error('Error getting test templates:', error);
     res.status(500).json({ error: 'Failed to get test templates' });
+    return;
   }
 });
 
@@ -358,12 +376,14 @@ router.post('/custom/:exerciseId', async (req, res) => {
       testCase,
       message: 'Custom test case created successfully'
     });
+    return;
   } catch (error) {
     console.error('Error creating custom test case:', error);
     res.status(500).json({
       error: 'Failed to create custom test case',
       details: error
     });
+    return;
   }
 });
 

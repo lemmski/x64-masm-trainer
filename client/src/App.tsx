@@ -9,7 +9,28 @@ import HelpCenter from './components/HelpCenter';
 import ApiDocs from './components/ApiDocs';
 import AssemblyReference from './components/AssemblyReference';
 import ErrorBoundary from './components/ErrorBoundary';
-import { Lesson, Exercise } from '../../../src/shared/types';
+// Using local type definitions for client-side
+interface Lesson {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  estimatedTime: number;
+  tags: string[];
+  content?: any;
+  exercises?: string[];
+}
+
+interface Exercise {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  points: number;
+  hints?: string[];
+  starterCode?: string;
+  testCases?: any[];
+}
 
 function App() {
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);

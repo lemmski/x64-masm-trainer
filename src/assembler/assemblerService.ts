@@ -30,14 +30,35 @@ export class AssemblerService {
       'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.35.32215\\bin\\Hostx64\\x64\\ml64.exe',
       'C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.35.32215\\bin\\Hostx64\\x64\\ml64.exe',
       'C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.35.32215\\bin\\Hostx64\\x64\\ml64.exe',
-      'C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64\\ml64.exe',
-      'ml64.exe' // In PATH
+      'C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64\\ml64.exe'
     ];
 
+    // First check hardcoded paths
     for (const ml64Path of possiblePaths) {
       if (fs.existsSync(ml64Path)) {
         return ml64Path;
       }
+    }
+
+    // If hardcoded paths don't work, try to find it in PATH using 'where' command
+    try {
+      const { execSync } = require('child_process');
+      const whereOutput = execSync('where ml64.exe', { encoding: 'utf8' });
+      const ml64Path = whereOutput.trim().split('\n')[0];
+      if (ml64Path && fs.existsSync(ml64Path)) {
+        return ml64Path;
+      }
+    } catch (error) {
+      // 'where' command failed, ml64.exe not found in PATH
+    }
+
+    // As a last resort, try to use ml64.exe directly (assuming it's in PATH)
+    try {
+      const { execSync } = require('child_process');
+      execSync('ml64.exe /?', { stdio: 'pipe' });
+      return 'ml64.exe'; // It's in PATH, use it directly
+    } catch (error) {
+      // ml64.exe not found
     }
 
     throw new Error('ML64.exe not found. Please install Visual Studio with C++ build tools.');
@@ -48,17 +69,38 @@ export class AssemblerService {
       'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.35.32215\\bin\\Hostx64\\x64\\link.exe',
       'C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Tools\\MSVC\\14.35.32215\\bin\\Hostx64\\x64\\link.exe',
       'C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.35.32215\\bin\\Hostx64\\x64\\link.exe',
-      'C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64\\link.exe',
-      'link.exe' // In PATH
+      'C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64\\link.exe'
     ];
 
+    // First check hardcoded paths
     for (const linkPath of possiblePaths) {
       if (fs.existsSync(linkPath)) {
         return linkPath;
       }
     }
 
-    throw new Error('link.exe not found. Please install Visual Studio with C++ build tools.');
+    // If hardcoded paths don't work, try to find it in PATH using 'where' command
+    try {
+      const { execSync } = require('child_process');
+      const whereOutput = execSync('where link.exe', { encoding: 'utf8' });
+      const linkPath = whereOutput.trim().split('\n')[0];
+      if (linkPath && fs.existsSync(linkPath)) {
+        return linkPath;
+      }
+    } catch (error) {
+      // 'where' command failed, link.exe not found in PATH
+    }
+
+    // As a last resort, try to use link.exe directly (assuming it's in PATH)
+    try {
+      const { execSync } = require('child_process');
+      execSync('link.exe /?', { stdio: 'pipe' });
+      return 'link.exe'; // It's in PATH, use it directly
+    } catch (error) {
+      // link.exe not found
+    }
+
+    throw new Error('LINK.exe not found. Please install Visual Studio with C++ build tools.');
   }
 
   async compileAndRun(
@@ -96,7 +138,8 @@ export class AssemblerService {
       if (!compileResult.success) {
         return {
           success: false,
-          error: compileResult.error,
+          output: '',
+          error: compileResult.error || 'Compilation failed',
           executionTime: Date.now() - startTime,
           exitCode: 1
         };
@@ -109,7 +152,8 @@ export class AssemblerService {
       if (!linkResult.success) {
         return {
           success: false,
-          error: linkResult.error,
+          output: '',
+          error: linkResult.error || 'Linking failed',
           executionTime: Date.now() - startTime,
           exitCode: 1
         };
@@ -128,17 +172,18 @@ export class AssemblerService {
 
       return {
         success: runResult.success,
-        output: runResult.output,
+        output: runResult.output || '',
         error: runResult.error,
         executionTime,
-        exitCode: runResult.exitCode
+        exitCode: runResult.exitCode || 0
       };
 
     } catch (error) {
       return {
         success: false,
+        output: '',
         error: `Internal error: ${error}`,
-        executionTime: Date.now() - Date.now(),
+        executionTime: 0,
         exitCode: 1
       };
     } finally {
@@ -230,11 +275,33 @@ export class AssemblerService {
     try {
       const runCmd = `"${exeFile}"`;
 
-      const { stdout, stderr } = await execAsync(runCmd, {
+      // Use spawn for better input handling
+      const { spawn } = require('child_process');
+      const child = spawn(runCmd.split(' ')[0], runCmd.split(' ').slice(1), {
         cwd: workingDir,
-        timeout,
-        maxBuffer: memoryLimit,
-        input
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+
+      let stdout = '';
+      let stderr = '';
+
+      child.stdout.on('data', (data: Buffer) => {
+        stdout += data.toString();
+      });
+
+      child.stderr.on('data', (data: Buffer) => {
+        stderr += data.toString();
+      });
+
+      if (input) {
+        child.stdin.write(input);
+        child.stdin.end();
+      }
+
+      const exitCode = await new Promise<number>((resolve) => {
+        child.on('close', (code: number) => {
+          resolve(code || 0);
+        });
       });
 
       return {

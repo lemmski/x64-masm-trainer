@@ -10,9 +10,11 @@ router.get('/', async (req, res) => {
     const difficulty = req.query.difficulty as string;
     const lessons = await lessonService.getLessons(difficulty);
     res.json(lessons);
+    return;
   } catch (error) {
     console.error('Error fetching lessons:', error);
     res.status(500).json({ error: 'Failed to fetch lessons' });
+    return;
   }
 });
 
@@ -26,9 +28,11 @@ router.get('/:id', async (req, res) => {
     }
 
     res.json(lesson);
+    return;
   } catch (error) {
     console.error('Error fetching lesson:', error);
     res.status(500).json({ error: 'Failed to fetch lesson' });
+    return;
   }
 });
 
@@ -42,9 +46,11 @@ router.get('/recommended/:userId', async (req, res) => {
     }
 
     res.json(recommendedLesson);
+    return;
   } catch (error) {
     console.error('Error fetching recommended lesson:', error);
     res.status(500).json({ error: 'Failed to fetch recommended lesson' });
+    return;
   }
 });
 

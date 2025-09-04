@@ -133,6 +133,7 @@ export class TestRunner {
 
     for (let i = 0; i < Math.min(testCases.length, 3); i++) { // Limit to 3 quick tests
       const testCase = testCases[i];
+      if (!testCase) continue;
 
       try {
         const startTime = Date.now();
@@ -142,28 +143,32 @@ export class TestRunner {
         const executionTime = Date.now() - startTime;
 
         const passed = result.success &&
-                      (result.output || '').trim() === testCase.expectedOutput.trim();
+                      (result.output || '').trim() === (testCase.expectedOutput || '').trim();
 
-        results.push({
-          input: testCase.input,
-          expectedOutput: testCase.expectedOutput,
-          actualOutput: result.output || '',
-          passed,
-          executionTime,
-          error: result.error
-        });
+        if (testCase) {
+          results.push({
+            input: testCase.input || '',
+            expectedOutput: testCase.expectedOutput || '',
+            actualOutput: result.output || '',
+            passed,
+            executionTime,
+            error: result.error
+          });
+        }
 
         if (passed) passedCount++;
 
       } catch (error: any) {
-        results.push({
-          input: testCase.input,
-          expectedOutput: testCase.expectedOutput,
-          actualOutput: '',
-          passed: false,
-          executionTime: 0,
-          error: error.message
-        });
+        if (testCase) {
+          results.push({
+            input: testCase.input || '',
+            expectedOutput: testCase.expectedOutput || '',
+            actualOutput: '',
+            passed: false,
+            executionTime: 0,
+            error: error.message
+          });
+        }
       }
     }
 
@@ -364,8 +369,8 @@ export class TestRunner {
   private findLineWithPattern(code: string, pattern: RegExp): string {
     const lines = code.split('\n');
     for (let i = 0; i < lines.length; i++) {
-      if (pattern.test(lines[i])) {
-        return lines[i].trim();
+      if (pattern.test(lines[i] || '')) {
+        return (lines[i] || '').trim();
       }
     }
     return '';
@@ -435,7 +440,7 @@ export interface ValidationTestResult {
   actualOutput: string;
   passed: boolean;
   executionTime: number;
-  error?: string;
+  error: string | undefined;
 }
 
 export interface PerformanceBenchmarkResult {

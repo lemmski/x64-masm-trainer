@@ -23,9 +23,11 @@ router.get('/:id', async (req, res) => {
     };
 
     res.json(formattedUser);
+    return;
   } catch (error) {
     console.error('Error fetching user:', error);
     res.status(500).json({ error: 'Failed to fetch user' });
+    return;
   }
 });
 
@@ -63,9 +65,11 @@ router.post('/', async (req, res) => {
     };
 
     res.status(201).json(user);
+    return;
   } catch (error) {
     console.error('Error creating user:', error);
     res.status(500).json({ error: 'Failed to create user' });
+    return;
   }
 });
 
@@ -84,9 +88,11 @@ router.put('/:id/preferences', async (req, res) => {
     );
 
     res.json({ success: true });
+    return;
   } catch (error) {
     console.error('Error updating preferences:', error);
     res.status(500).json({ error: 'Failed to update preferences' });
+    return;
   }
 });
 

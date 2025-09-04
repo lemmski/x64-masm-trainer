@@ -14,7 +14,38 @@ import {
   Award,
   X
 } from 'lucide-react';
-import { Lesson, Exercise, LessonProgress } from '../../../../src/shared/types';
+// Using local type definitions for client-side
+interface Lesson {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  estimatedTime: number;
+  tags: string[];
+  content?: any;
+  exercises?: string[];
+}
+
+interface Exercise {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  points: number;
+  hints?: string[];
+  starterCode?: string;
+  testCases?: any[];
+}
+
+interface LessonProgress {
+  lessonId: string;
+  completed: boolean;
+  score: number;
+  timeSpent: number;
+  attempts: number;
+  lastAttempt: Date;
+  completedExercises: string[];
+}
 
 interface SidebarProps {
   isOpen: boolean;

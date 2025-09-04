@@ -1,7 +1,41 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Editor, { Monaco } from '@monaco-editor/react';
 import { Play, RotateCcw, Save, Lightbulb, CheckCircle, XCircle, AlertCircle, Target } from 'lucide-react';
-import { Exercise, AssemblyResult, ExerciseSubmission, TestResult } from '../../../../src/shared/types';
+// Note: Types should be shared via a proper build setup
+interface Exercise {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  points: number;
+  hints: string[];
+}
+
+interface AssemblyResult {
+  success: boolean;
+  output: string;
+  error: string | undefined;
+  executionTime: number;
+  exitCode: number;
+}
+
+interface TestResult {
+  testCaseId: string;
+  passed: boolean;
+  actualOutput: string;
+  expectedOutput: string;
+  executionTime: number;
+  error: string | undefined;
+}
+
+interface ExerciseSubmission {
+  id: string;
+  exerciseId: string;
+  code: string;
+  results: TestResult[];
+  score: number;
+  timestamp: Date;
+}
 import TestRunner from './TestRunner';
 
 interface CodeEditorProps {
@@ -165,7 +199,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exercise, onLessonSelect }) => 
             'bg-red-600'
           }`}>
             {exercise.difficulty}
-          </span>}
+          </span></span>
           <span>Points: {exercise.points}</span>
           <button
             onClick={() => setShowHints(!showHints)}

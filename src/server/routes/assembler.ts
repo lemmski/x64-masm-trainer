@@ -18,13 +18,15 @@ router.post('/compile', async (req, res) => {
       allowSystemCalls
     });
 
-    res.json(result);
+          res.json(result);
+      return;
   } catch (error) {
     console.error('Error in compilation:', error);
     res.status(500).json({
       error: 'Internal server error during compilation',
       details: error
     });
+    return;
   }
 });
 
@@ -39,10 +41,12 @@ router.post('/validate', async (req, res) => {
 
     const result = await assemblerService.validateSyntax(code);
     res.json(result);
+    return;
 
   } catch (error) {
     console.error('Error validating code:', error);
     res.status(500).json({ error: 'Failed to validate code' });
+    return;
   }
 });
 

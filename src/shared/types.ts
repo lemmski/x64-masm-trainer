@@ -44,7 +44,7 @@ export interface CodeExample {
   title: string;
   code: string;
   explanation: string;
-  language: 'masm' | 'output';
+  language?: 'masm' | 'output';
 }
 
 export interface Exercise {
@@ -79,10 +79,10 @@ export interface LessonProgress {
 
 export interface AssemblyResult {
   success: boolean;
-  output?: string;
-  error?: string;
+  output: string;
+  error: string | undefined;
   executionTime: number;
-  exitCode?: number;
+  exitCode: number;
 }
 
 export interface CodeSubmission {
@@ -98,7 +98,7 @@ export interface TestResult {
   actualOutput: string;
   expectedOutput: string;
   executionTime: number;
-  error?: string;
+  error: string | undefined;
 }
 
 export interface ExerciseSubmission {
@@ -112,3 +112,155 @@ export interface ExerciseSubmission {
 
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 export type ExerciseDifficulty = 'easy' | 'medium' | 'hard';
+
+// Testing Framework Types
+export interface TestSuite {
+  id: string;
+  name: string;
+  description: string;
+  testCases: TestCase[];
+  configuration: TestConfiguration;
+}
+
+export interface TestConfiguration {
+  timeout: number;
+  memoryLimit: number;
+  allowSystemCalls: boolean;
+  testType: TestType;
+  gradingCriteria: GradingCriteria;
+}
+
+export type TestType =
+  | 'output_validation'
+  | 'unit_test'
+  | 'performance_test'
+  | 'memory_test'
+  | 'security_test'
+  | 'code_quality';
+
+export interface GradingCriteria {
+  outputWeight: number;
+  performanceWeight: number;
+  codeQualityWeight: number;
+  securityWeight: number;
+  bonusPoints: {
+    earlyCompletion: number;
+    efficientCode: number;
+    cleanCode: number;
+  };
+}
+
+export interface TestExecutionResult {
+  testSuiteId: string;
+  results: TestResult[];
+  summary: TestSummary;
+  grade: Grade;
+  feedback: Feedback;
+}
+
+export interface TestSummary {
+  totalTests: number;
+  passedTests: number;
+  failedTests: number;
+  averageExecutionTime: number;
+  totalExecutionTime: number;
+  memoryUsage: number;
+}
+
+export interface Grade {
+  score: number;
+  maxScore: number;
+  percentage: number;
+  letterGrade: string;
+  breakdown: {
+    output: number;
+    performance: number;
+    quality: number;
+    security: number;
+    bonus: number;
+  };
+}
+
+export interface Feedback {
+  overall: {
+    message: string;
+    sentiment: 'excellent' | 'good' | 'fair' | 'needs_work';
+  };
+  strengths: string[];
+  weaknesses?: string[];
+  codeQuality: CodeQualityAnalysis;
+  performanceMetrics: PerformanceMetrics;
+}
+
+export interface PerformanceMetrics {
+  executionTime: number;
+  instructionsExecuted: number;
+  memoryUsage: number;
+  codeSize: number;
+  efficiency: number;
+}
+
+export interface Recommendation {
+  type: 'improvement' | 'optimization' | 'best_practice' | 'learning';
+  priority: 'high' | 'medium' | 'low';
+  title: string;
+  description: string;
+  codeExample?: string;
+}
+
+export interface DetailedGrade {
+  score: number;
+  maxScore: number;
+  percentage: number;
+  letterGrade: string;
+  breakdown: GradeBreakdown;
+  feedback: DetailedFeedback;
+  recommendations: Recommendation[];
+}
+
+export interface GradeBreakdown {
+  functionality: {
+    score: number;
+    maxScore: number;
+    percentage: number;
+    description: string;
+  };
+  efficiency: {
+    score: number;
+    maxScore: number;
+    percentage: number;
+    description: string;
+  };
+  style: {
+    score: number;
+    maxScore: number;
+    percentage: number;
+    description: string;
+  };
+  robustness: {
+    score: number;
+    maxScore: number;
+    percentage: number;
+    description: string;
+  };
+}
+
+export interface DetailedFeedback {
+  overall: {
+    message: string;
+    sentiment: 'excellent' | 'good' | 'fair' | 'needs_work';
+  };
+  strengths: string[];
+  weaknesses: string[];
+  codeQuality: CodeQualityAnalysis;
+  performanceMetrics: PerformanceMetrics;
+}
+
+export interface CodeQualityAnalysis {
+  linesOfCode: number;
+  instructionCount: number;
+  registerUsage: Record<string, number>;
+  efficiency: number;
+  readability: number;
+  maintainability: number;
+}

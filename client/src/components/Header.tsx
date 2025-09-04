@@ -11,7 +11,8 @@ import {
   Home,
   Target,
   TrendingUp,
-  Bell
+  Bell,
+  Book
 } from 'lucide-react';
 
 interface HeaderProps {

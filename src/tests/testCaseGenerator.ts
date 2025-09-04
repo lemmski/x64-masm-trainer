@@ -19,14 +19,14 @@ export class TestCaseGenerator {
       {
         name: 'Addition Test',
         description: 'Test basic addition operations',
-        inputGenerator: () => {
+        inputGenerator: (): string => {
           const a = Math.floor(Math.random() * 100);
           const b = Math.floor(Math.random() * 100);
           return `${a} ${b}`;
         },
-        expectedOutputGenerator: (input) => {
-          const [a, b] = input.split(' ').map(Number);
-          return (a + b).toString();
+        expectedOutputGenerator: (input: string): string => {
+          const [a, b] = input.split(' ');
+          return ((parseInt(a || '0') || 0) + (parseInt(b || '0') || 0)).toString();
         },
         difficulty: 'easy',
         tags: ['arithmetic', 'addition']
@@ -34,14 +34,14 @@ export class TestCaseGenerator {
       {
         name: 'Subtraction Test',
         description: 'Test subtraction operations',
-        inputGenerator: () => {
+        inputGenerator: (): string => {
           const a = Math.floor(Math.random() * 100) + 50; // Ensure positive result
           const b = Math.floor(Math.random() * 50);
           return `${a} ${b}`;
         },
-        expectedOutputGenerator: (input) => {
-          const [a, b] = input.split(' ').map(Number);
-          return (a - b).toString();
+        expectedOutputGenerator: (input: string): string => {
+          const [a, b] = input.split(' ');
+          return ((parseInt(a || '0') || 0) - (parseInt(b || '0') || 0)).toString();
         },
         difficulty: 'easy',
         tags: ['arithmetic', 'subtraction']
@@ -49,14 +49,14 @@ export class TestCaseGenerator {
       {
         name: 'Multiplication Test',
         description: 'Test multiplication operations',
-        inputGenerator: () => {
+        inputGenerator: (): string => {
           const a = Math.floor(Math.random() * 20) + 1;
           const b = Math.floor(Math.random() * 20) + 1;
           return `${a} ${b}`;
         },
-        expectedOutputGenerator: (input) => {
-          const [a, b] = input.split(' ').map(Number);
-          return (a * b).toString();
+        expectedOutputGenerator: (input: string): string => {
+          const [a, b] = input.split(' ');
+          return ((parseInt(a || '0') || 0) * (parseInt(b || '0') || 0)).toString();
         },
         difficulty: 'medium',
         tags: ['arithmetic', 'multiplication']
@@ -64,15 +64,15 @@ export class TestCaseGenerator {
       {
         name: 'Complex Expression',
         description: 'Test complex arithmetic expressions',
-        inputGenerator: () => {
+        inputGenerator: (): string => {
           const a = Math.floor(Math.random() * 10) + 1;
           const b = Math.floor(Math.random() * 10) + 1;
           const c = Math.floor(Math.random() * 5) + 1;
           return `${a} ${b} ${c}`;
         },
-        expectedOutputGenerator: (input) => {
-          const [a, b, c] = input.split(' ').map(Number);
-          return ((a + b) * c).toString(); // (a + b) * c
+        expectedOutputGenerator: (input: string): string => {
+          const [a, b, c] = input.split(' ');
+          return (((parseInt(a || '0') || 0) + (parseInt(b || '0') || 0)) * (parseInt(c || '0') || 0)).toString(); // (a + b) * c
         },
         difficulty: 'hard',
         tags: ['arithmetic', 'complex']
@@ -95,7 +95,7 @@ export class TestCaseGenerator {
       {
         name: 'Register Movement',
         description: 'Test moving values between registers',
-        inputGenerator: () => {
+        inputGenerator: (): string => {
           const value = Math.floor(Math.random() * 1000);
           return value.toString();
         },
@@ -106,7 +106,7 @@ export class TestCaseGenerator {
       {
         name: 'Register Exchange',
         description: 'Test exchanging values between registers',
-        inputGenerator: () => {
+        inputGenerator: (): string => {
           const a = Math.floor(Math.random() * 100);
           const b = Math.floor(Math.random() * 100);
           return `${a} ${b}`;
@@ -136,27 +136,27 @@ export class TestCaseGenerator {
       {
         name: 'String Length',
         description: 'Calculate length of input string',
-        inputGenerator: () => {
+        inputGenerator: (): string => {
           const words = ['hello', 'world', 'assembly', 'programming', 'computer'];
-          const word = words[Math.floor(Math.random() * words.length)];
+          const word = words[Math.floor(Math.random() * words.length)] || '';
           return word;
         },
-        expectedOutputGenerator: (input) => input.length.toString(),
+        expectedOutputGenerator: (input: string): string => input.length.toString(),
         difficulty: 'medium',
         tags: ['strings', 'length']
       },
       {
         name: 'Character Count',
         description: 'Count occurrences of a specific character',
-        inputGenerator: () => {
+        inputGenerator: (): string => {
           const words = ['programming', 'assembly', 'language', 'computer'];
-          const word = words[Math.floor(Math.random() * words.length)];
-          const char = word[Math.floor(Math.random() * word.length)];
+          const word = words[Math.floor(Math.random() * words.length)] || '';
+          const char = word.charAt(Math.floor(Math.random() * word.length));
           return `${word} ${char}`;
         },
-        expectedOutputGenerator: (input) => {
+        expectedOutputGenerator: (input: string): string => {
           const [word, char] = input.split(' ');
-          return word.split(char).length - 1;
+          return ((word || '').split(char || '').length - 1 || 0).toString();
         },
         difficulty: 'hard',
         tags: ['strings', 'character', 'count']
@@ -179,7 +179,7 @@ export class TestCaseGenerator {
       {
         name: 'Conditional Output',
         description: 'Output different values based on condition',
-        inputGenerator: () => {
+        inputGenerator: (): string => {
           const num = Math.floor(Math.random() * 20) + 1;
           return num.toString();
         },
@@ -193,7 +193,7 @@ export class TestCaseGenerator {
       {
         name: 'Loop Sum',
         description: 'Calculate sum using loop',
-        inputGenerator: () => {
+        inputGenerator: (): string => {
           const n = Math.floor(Math.random() * 10) + 1;
           return n.toString();
         },
@@ -222,16 +222,16 @@ export class TestCaseGenerator {
       {
         name: 'Array Access',
         description: 'Access and manipulate array elements',
-        inputGenerator: () => {
+        inputGenerator: (): string => {
           const array = Array.from({length: 5}, () => Math.floor(Math.random() * 50));
           const index = Math.floor(Math.random() * 5);
           return `${array.join(' ')} ${index}`;
         },
-        expectedOutputGenerator: (input) => {
+        expectedOutputGenerator: (input: string): string => {
           const parts = input.split(' ');
-          const array = parts.slice(0, 5).map(Number);
-          const index = parseInt(parts[5]);
-          return array[index].toString();
+          const array = parts.slice(0, 5).map(n => parseInt(n) || 0);
+          const index = parseInt(parts[5] || '0');
+          return (array[index] || 0).toString();
         },
         difficulty: 'hard',
         tags: ['memory', 'arrays', 'indexing']
@@ -239,7 +239,7 @@ export class TestCaseGenerator {
       {
         name: 'Memory Copy',
         description: 'Copy data between memory locations',
-        inputGenerator: () => {
+        inputGenerator: (): string => {
           const values = Array.from({length: 3}, () => Math.floor(Math.random() * 100));
           return values.join(' ');
         },
@@ -265,7 +265,7 @@ export class TestCaseGenerator {
       {
         name: 'Fibonacci Performance',
         description: 'Calculate fibonacci numbers efficiently',
-        inputGenerator: () => {
+        inputGenerator: (): string => {
           const n = Math.floor(Math.random() * 10) + 10; // 10-20
           return n.toString();
         },
@@ -283,7 +283,7 @@ export class TestCaseGenerator {
       {
         name: 'Factorial Performance',
         description: 'Calculate factorial efficiently',
-        inputGenerator: () => {
+        inputGenerator: (): string => {
           const n = Math.floor(Math.random() * 8) + 5; // 5-12
           return n.toString();
         },
@@ -317,14 +317,14 @@ export class TestCaseGenerator {
       {
         name: 'Function Call',
         description: 'Test function call and return',
-        inputGenerator: () => {
+        inputGenerator: (): string => {
           const a = Math.floor(Math.random() * 20) + 1;
           const b = Math.floor(Math.random() * 20) + 1;
           return `${a} ${b}`;
         },
-        expectedOutputGenerator: (input) => {
-          const [a, b] = input.split(' ').map(Number);
-          return Math.max(a, b).toString(); // Simple max function
+        expectedOutputGenerator: (input: string): string => {
+          const [a, b] = input.split(' ');
+          return Math.max(parseInt(a || '0') || 0, parseInt(b || '0') || 0).toString(); // Simple max function
         },
         difficulty: 'medium',
         tags: ['functions', 'procedures', 'calls']
@@ -332,7 +332,7 @@ export class TestCaseGenerator {
       {
         name: 'Recursive Function',
         description: 'Test recursive function calls',
-        inputGenerator: () => {
+        inputGenerator: (): string => {
           const n = Math.floor(Math.random() * 8) + 3; // 3-10
           return n.toString();
         },

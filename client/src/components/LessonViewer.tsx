@@ -1,7 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Code, BookOpen } from 'lucide-react';
-import { Lesson, Exercise } from '../../../../src/shared/types';
+// Using local type definitions for client-side
+interface Lesson {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  estimatedTime: number;
+  tags: string[];
+  content?: any;
+  exercises?: string[];
+}
+
+interface Exercise {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  points: number;
+  hints?: string[];
+  starterCode?: string;
+  testCases?: any[];
+}
 import ProgressTracker from './ProgressTracker';
 
 interface LessonViewerProps {

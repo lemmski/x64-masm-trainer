@@ -9,7 +9,9 @@ import {
   Server,
   Database,
   TestTube,
-  Settings
+  Settings,
+  Book,
+  X
 } from 'lucide-react';
 
 interface ApiEndpoint {
@@ -310,7 +312,7 @@ Content-Type: application/json
             }
           ],
           requestBody: {
-            concepts: ['string']?,
+            concepts: ['string'],
             count: 'number?'
           }
         },

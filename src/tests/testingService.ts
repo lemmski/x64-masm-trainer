@@ -70,11 +70,20 @@ export interface Grade {
 }
 
 export interface Feedback {
-  overall: string;
+  overall: {
+    message: string;
+    sentiment: 'excellent' | 'good' | 'fair' | 'needs_work';
+  };
   strengths: string[];
-  improvements: string[];
-  suggestions: string[];
+  weaknesses?: string[];
   codeQuality: CodeQualityAnalysis;
+  performanceMetrics: {
+    executionTime: number;
+    instructionsExecuted: number;
+    memoryUsage: number;
+    codeSize: number;
+    efficiency: number;
+  };
 }
 
 export interface CodeQualityAnalysis {
@@ -159,7 +168,7 @@ export class TestingService {
         actualOutput: result.output || '',
         expectedOutput: testCase.expectedOutput,
         executionTime,
-        error: result.error
+        error: result.error || undefined
       };
     } catch (error: any) {
       return {
@@ -431,11 +440,14 @@ export class TestingService {
     testSuite: TestSuite
   ): Feedback {
     const feedback: Feedback = {
-      overall: this.generateOverallFeedback(grade),
+      overall: {
+        message: this.generateOverallFeedback(grade),
+        sentiment: this.calculateSentiment(grade.percentage)
+      },
       strengths: this.generateStrengths(results, code),
-      improvements: this.generateImprovements(results, code),
-      suggestions: this.generateSuggestions(results, testSuite),
-      codeQuality: this.analyzeCodeQuality(code)
+      weaknesses: this.generateWeaknesses(results, code),
+      codeQuality: this.analyzeCodeQuality(code),
+      performanceMetrics: this.generatePerformanceMetrics(results)
     };
 
     return feedback;
@@ -444,6 +456,13 @@ export class TestingService {
   /**
    * Generate overall feedback message
    */
+  private calculateSentiment(percentage: number): 'excellent' | 'good' | 'fair' | 'needs_work' {
+    if (percentage >= 90) return 'excellent';
+    if (percentage >= 75) return 'good';
+    if (percentage >= 60) return 'fair';
+    return 'needs_work';
+  }
+
   private generateOverallFeedback(grade: Grade): string {
     if (grade.percentage >= 90) {
       return "Excellent work! You've mastered this concept with outstanding performance.";
@@ -461,6 +480,35 @@ export class TestingService {
   /**
    * Generate list of strengths
    */
+  private generateWeaknesses(results: TestResult[], code: string): string[] {
+    const weaknesses: string[] = [];
+
+    const failedTests = results.filter(r => !r.passed).length;
+    if (failedTests > 0) {
+      weaknesses.push(`${failedTests} test(s) failed`);
+    }
+
+    const avgTime = results.reduce((sum, r) => sum + r.executionTime, 0) / results.length;
+    if (avgTime > 1000) {
+      weaknesses.push('Execution time could be optimized');
+    }
+
+    return weaknesses;
+  }
+
+  private generatePerformanceMetrics(results: TestResult[]) {
+    const avgTime = results.reduce((sum, r) => sum + r.executionTime, 0) / results.length;
+    const totalTime = results.reduce((sum, r) => sum + r.executionTime, 0);
+
+    return {
+      executionTime: avgTime,
+      instructionsExecuted: 0, // Would need analysis of actual assembly instructions
+      memoryUsage: 0, // Would need memory profiling
+      codeSize: 0, // Would need code size analysis
+      efficiency: totalTime > 0 ? 1000 / totalTime : 0
+    };
+  }
+
   private generateStrengths(results: TestResult[], code: string): string[] {
     const strengths: string[] = [];
 
